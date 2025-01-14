@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: Point To Point Communication
 # Author: aruncs
-# GNU Radio version: 3.10.11.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
@@ -25,7 +25,6 @@ from gnuradio import eng_notation
 from gnuradio import iio
 import numpy as np
 import sip
-import threading
 
 
 
@@ -52,7 +51,7 @@ class pointToPointCommunication(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "pointToPointCommunication")
+        self.settings = Qt.QSettings("GNU Radio", "pointToPointCommunication")
 
         try:
             geometry = self.settings.value("geometry")
@@ -60,7 +59,6 @@ class pointToPointCommunication(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Variables
@@ -296,7 +294,7 @@ class pointToPointCommunication(gr.top_block, Qt.QWidget):
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "pointToPointCommunication")
+        self.settings = Qt.QSettings("GNU Radio", "pointToPointCommunication")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -341,7 +339,6 @@ def main(top_block_cls=pointToPointCommunication, options=None):
     tb = top_block_cls()
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 
