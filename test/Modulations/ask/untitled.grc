@@ -1,6 +1,6 @@
 options:
   parameters:
-    author: ''
+    author: aruncs
     catch_exceptions: 'True'
     category: '[GRC Hier Blocks]'
     cmake_opt: ''
@@ -11,7 +11,7 @@ options:
     gen_linking: dynamic
     generate_options: qt_gui
     hier_block_src_path: '.:'
-    id: radio
+    id: untitled
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -33,11 +33,32 @@ options:
     state: enabled
 
 blocks:
+- name: freq
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: ''
+    label: ''
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '100'
+    step: 1e-1
+    stop: 16e3
+    value: 1e3
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [304, 8.0]
+    rotation: 0
+    state: enabled
 - name: samp_rate
   id: variable
   parameters:
     comment: ''
-    value: '2000000'
+    value: '32000'
   states:
     bus_sink: false
     bus_source: false
@@ -45,89 +66,48 @@ blocks:
     coordinate: [200, 12]
     rotation: 0
     state: enabled
-- name: analog_wfm_rcv_0
-  id: analog_wfm_rcv
+- name: analog_sig_source_x_0
+  id: analog_sig_source_x
   parameters:
     affinity: ''
     alias: ''
-    audio_decimation: '10'
+    amp: '1'
     comment: ''
+    freq: freq
     maxoutbuf: '0'
     minoutbuf: '0'
-    quad_rate: '200000'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [736, 292.0]
-    rotation: 0
-    state: enabled
-- name: audio_sink_0
-  id: audio_sink
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    device_name: ''
-    num_inputs: '1'
-    ok_to_block: 'True'
-    samp_rate: '48000'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1256, 304.0]
-    rotation: 0
-    state: enabled
-- name: freq_xlating_fir_filter_xxx_0
-  id: freq_xlating_fir_filter_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    center_freq: '0'
-    comment: ''
-    decim: '10'
-    maxoutbuf: '0'
-    minoutbuf: '0'
+    offset: '0'
+    phase: '0'
     samp_rate: samp_rate
-    taps: (1,2e6,100e3,10e3)
-    type: ccc
+    showports: 'False'
+    type: float
+    waveform: analog.GR_COS_WAVE
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [440, 268.0]
+    coordinate: [40, 224.0]
     rotation: 0
     state: enabled
-- name: iio_pluto_source_0
-  id: iio_pluto_source
+- name: blocks_throttle2_0
+  id: blocks_throttle2
   parameters:
     affinity: ''
     alias: ''
-    bandwidth: '200000'
-    bbdc: 'True'
-    buffer_size: '32768'
     comment: ''
-    filter: ''
-    filter_source: '''Auto'''
-    fpass: '0'
-    frequency: '91900000'
-    fstop: '0'
-    gain1: '''manual'''
-    len_tag_key: packet_len
-    manual_gain1: '50'
+    ignoretag: 'True'
+    limit: auto
+    maximum: '0.1'
     maxoutbuf: '0'
     minoutbuf: '0'
-    quadrature: 'True'
-    rfdc: 'True'
-    samplerate: samp_rate
-    type: fc32
-    uri: 192.16.2.1
+    samples_per_second: samp_rate
+    type: float
+    vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [144, 192.0]
+    coordinate: [264, 256.0]
     rotation: 0
     state: enabled
 - name: qtgui_freq_sink_x_0
@@ -161,7 +141,7 @@ blocks:
     color9: '"dark green"'
     comment: ''
     ctrlpanel: 'False'
-    fc: '0'
+    fc: freq
     fftsize: '1024'
     freqhalf: 'True'
     grid: 'False'
@@ -180,7 +160,7 @@ blocks:
     legend: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
-    name: '""'
+    name: Freq Domain
     nconnections: '1'
     norm_window: 'False'
     showports: 'False'
@@ -188,7 +168,7 @@ blocks:
     tr_level: '0.0'
     tr_mode: qtgui.TRIG_MODE_FREE
     tr_tag: '""'
-    type: complex
+    type: float
     units: dB
     update_time: '0.10'
     width1: '1'
@@ -208,37 +188,14 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [728, 516.0]
-    rotation: 0
-    state: enabled
-- name: rational_resampler_xxx_0
-  id: rational_resampler_xxx
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    decim: '10'
-    fbw: '0'
-    interp: '48000'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    taps: '[]'
-    type: fff
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [968, 276.0]
+    coordinate: [440, 248.0]
     rotation: 0
     state: enabled
 
 connections:
-- [analog_wfm_rcv_0, '0', rational_resampler_xxx_0, '0']
-- [freq_xlating_fir_filter_xxx_0, '0', analog_wfm_rcv_0, '0']
-- [freq_xlating_fir_filter_xxx_0, '0', qtgui_freq_sink_x_0, '0']
-- [iio_pluto_source_0, '0', freq_xlating_fir_filter_xxx_0, '0']
-- [rational_resampler_xxx_0, '0', audio_sink_0, '0']
+- [analog_sig_source_x_0, '0', blocks_throttle2_0, '0']
+- [blocks_throttle2_0, '0', qtgui_freq_sink_x_0, '0']
 
 metadata:
   file_format: 1
-  grc_version: 3.10.10.0
+  grc_version: 3.10.11.0
