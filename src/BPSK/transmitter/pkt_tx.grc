@@ -107,18 +107,6 @@ blocks:
     coordinate: [992, 12.0]
     rotation: 0
     state: true
-- name: pluto_rate
-  id: variable
-  parameters:
-    comment: ''
-    value: '768000'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [192, 76.0]
-    rotation: 0
-    state: true
 - name: rs_ratio
   id: variable
   parameters:
@@ -155,6 +143,18 @@ blocks:
     coordinate: [288, 12.0]
     rotation: 0
     state: enabled
+- name: usrp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '768000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [192, 76.0]
+    rotation: 0
+    state: true
 - name: InFile
   id: parameter
   parameters:
@@ -189,9 +189,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [536, 880.0]
+    coordinate: [200, 532.0]
     rotation: 0
-    state: disabled
+    state: true
 - name: blocks_tagged_stream_mux_0
   id: blocks_tagged_stream_mux
   parameters:
@@ -209,7 +209,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [888, 336.0]
+    coordinate: [1056, 192.0]
     rotation: 0
     state: true
 - name: blocks_throttle2_0_0
@@ -223,14 +223,14 @@ blocks:
     maximum: '0.1'
     maxoutbuf: '0'
     minoutbuf: '0'
-    samples_per_second: pluto_rate
+    samples_per_second: usrp_rate
     type: complex
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1048, 648.0]
+    coordinate: [920, 388.0]
     rotation: 0
     state: true
 - name: blocks_uchar_to_float_0_0_0_0
@@ -245,9 +245,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [736, 760.0]
+    coordinate: [408, 544.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: digital_constellation_modulator_0
   id: digital_constellation_modulator
   parameters:
@@ -267,7 +267,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [664, 456.0]
+    coordinate: [208, 340.0]
     rotation: 0
     state: enabled
 - name: digital_crc32_bb_0
@@ -285,7 +285,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [432, 344.0]
+    coordinate: [496, 204.0]
     rotation: 0
     state: true
 - name: digital_protocol_formatter_bb_0
@@ -302,13 +302,13 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [680, 232.0]
+    coordinate: [776, 164.0]
     rotation: 0
     state: true
 - name: epy_block_0
   id: epy_block
   parameters:
-    FileName: '"file.txt"'
+    FileName: '"nandanam.png"'
     Pkt_len: '60'
     _source_code: "\"\"\"\nEmbedded Python Block: File Source to Tagged Stream\n\"\
       \"\"\n\nimport numpy as np\nfrom gnuradio import gr\nimport time\nimport pmt\n\
@@ -382,7 +382,9 @@ blocks:
       \            return (self.f_len)\n\n        return (0)\n\n"
     affinity: ''
     alias: ''
-    comment: ''
+    comment: 'Filename is specified on the command line, e.g.:
+
+      python3 pkt_xmt.py --InFile="../gr-logo.png"'
     maxoutbuf: '0'
     minoutbuf: '0'
   states:
@@ -391,8 +393,8 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [424, 248.0]
-    rotation: 180
+    coordinate: [144, 212.0]
+    rotation: 0
     state: true
 - name: fft_filter_xxx_0_0_0
   id: fft_filter_xxx
@@ -411,7 +413,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [520, 608.0]
+    coordinate: [448, 348.0]
     rotation: 0
     state: true
 - name: iio_pluto_sink_0
@@ -437,8 +439,8 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1040, 756.0]
-    rotation: 180
+    coordinate: [1136, 508.0]
+    rotation: 0
     state: enabled
 - name: mmse_resampler_xx_0
   id: mmse_resampler_xx
@@ -449,13 +451,13 @@ blocks:
     maxoutbuf: '0'
     minoutbuf: '0'
     phase_shift: '0'
-    resamp_ratio: 1.0/((pluto_rate/samp_rate)*rs_ratio)
+    resamp_ratio: 1.0/((usrp_rate/samp_rate)*rs_ratio)
     type: complex
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [776, 632.0]
+    coordinate: [688, 368.0]
     rotation: 0
     state: true
 - name: qtgui_time_sink_x_0
@@ -552,20 +554,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [792, 1000.0]
-    rotation: 0
-    state: disabled
-- name: virtual_sink_0
-  id: virtual_sink
-  parameters:
-    alias: ''
-    comment: ''
-    stream_id: modulated
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [904, 480.0]
+    coordinate: [576, 516.0]
     rotation: 0
     state: enabled
 - name: virtual_sink_0_0
@@ -573,40 +562,27 @@ blocks:
   parameters:
     alias: ''
     comment: ''
-    stream_id: processed_data
+    stream_id: t1
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [912, 264.0]
-    rotation: 180
+    coordinate: [1304, 204.0]
+    rotation: 0
     state: true
 - name: virtual_source_0
   id: virtual_source
   parameters:
     alias: ''
     comment: ''
-    stream_id: processed_data
+    stream_id: t1
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [448, 480.0]
+    coordinate: [24, 364.0]
     rotation: 0
     state: true
-- name: virtual_source_1
-  id: virtual_source
-  parameters:
-    alias: ''
-    comment: ''
-    stream_id: modulated
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [312, 624.0]
-    rotation: 0
-    state: enabled
 - name: zeromq_pub_sink_0
   id: zeromq_pub_sink
   parameters:
@@ -626,7 +602,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1080, 944.0]
+    coordinate: [1144, 344.0]
     rotation: 0
     state: disabled
 
@@ -636,7 +612,7 @@ connections:
 - [blocks_throttle2_0_0, '0', iio_pluto_sink_0, '0']
 - [blocks_throttle2_0_0, '0', zeromq_pub_sink_0, '0']
 - [blocks_uchar_to_float_0_0_0_0, '0', qtgui_time_sink_x_0, '0']
-- [digital_constellation_modulator_0, '0', virtual_sink_0, '0']
+- [digital_constellation_modulator_0, '0', fft_filter_xxx_0_0_0, '0']
 - [digital_crc32_bb_0, '0', blocks_tagged_stream_mux_0, '1']
 - [digital_crc32_bb_0, '0', digital_protocol_formatter_bb_0, '0']
 - [digital_protocol_formatter_bb_0, '0', blocks_tagged_stream_mux_0, '0']
@@ -645,7 +621,6 @@ connections:
 - [mmse_resampler_xx_0, '0', blocks_throttle2_0_0, '0']
 - [virtual_source_0, '0', blocks_repack_bits_bb_0_0, '0']
 - [virtual_source_0, '0', digital_constellation_modulator_0, '0']
-- [virtual_source_1, '0', fft_filter_xxx_0_0_0, '0']
 
 metadata:
   file_format: 1
