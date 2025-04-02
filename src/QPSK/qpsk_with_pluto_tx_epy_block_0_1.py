@@ -31,7 +31,7 @@ class blk(gr.sync_block):
         self.state = 0      # idle state
         self.pre_count = 0
         self.indx = 0
-        self._debug = 0     # debug
+        self._debug = 1     # debug
         self.data = ""
 
         if (os.path.exists(self.FileName)):

@@ -5,8 +5,8 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: Packet Transmit
-# Description: packet transmit
+# Title: QPSK Pluto Receiver
+# Author: aruncs
 # GNU Radio version: 3.10.12.0
 
 from PyQt5 import Qt
@@ -24,18 +24,18 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import iio
+import qpsk_with_pluto_tx_epy_block_0_1 as epy_block_0_1  # embedded python block
 import sip
 import threading
-import transmitter_epy_block_0 as epy_block_0  # embedded python block
 
 
 
-class transmitter(gr.top_block, Qt.QWidget):
+class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
 
     def __init__(self, InFile='default'):
-        gr.top_block.__init__(self, "Packet Transmit", catch_exceptions=True)
+        gr.top_block.__init__(self, "QPSK Pluto Receiver", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Packet Transmit")
+        self.setWindowTitle("QPSK Pluto Receiver")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -53,7 +53,7 @@ class transmitter(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "transmitter")
+        self.settings = Qt.QSettings("gnuradio/flowgraphs", "qpsk_with_pluto_tx")
 
         try:
             geometry = self.settings.value("geometry")
@@ -71,6 +71,7 @@ class transmitter(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
+        self.usrp_rate = usrp_rate = 768000
         self.sps = sps = 4
         self.samp_rate = samp_rate = 48000
         self.qpsk = qpsk = digital.constellation_rect([0.707+0.707j, -0.707+0.707j, -0.707-0.707j, 0.707-0.707j], [0, 1, 2, 3],
@@ -78,7 +79,7 @@ class transmitter(gr.top_block, Qt.QWidget):
         self.nfilts = nfilts = 32
         self.access_key = access_key = "1110000101011010111010001001001111100001010110101110100010010011"
         self.variable_adaptive_algorithm_0 = variable_adaptive_algorithm_0 = digital.adaptive_algorithm_cma( qpsk, .0001, 4).base()
-        self.usrp_rate = usrp_rate = 768000
+        self.taps = taps = firdes.low_pass(1.0, usrp_rate, samp_rate/2*0.8, 1000, window.WIN_HAMMING)
         self.rs_ratio = rs_ratio = 1.040
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), 0.35, 11*sps*nfilts)
         self.phase_bw = phase_bw = 0.0628
@@ -187,12 +188,12 @@ class transmitter(gr.top_block, Qt.QWidget):
         self.iio_pluto_sink_0.set_len_tag_key('packet_len')
         self.iio_pluto_sink_0.set_bandwidth(20000000)
         self.iio_pluto_sink_0.set_frequency(int(5e9))
-        self.iio_pluto_sink_0.set_samplerate(768000)
+        self.iio_pluto_sink_0.set_samplerate(usrp_rate)
         self.iio_pluto_sink_0.set_attenuation(0, 10.0)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
         self.fft_filter_xxx_0_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0_0.declare_sample_delay(0)
-        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=60)
+        self.epy_block_0_1 = epy_block_0_1.blk(FileName="message.txt", Pkt_len=60)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
         self.digital_crc32_bb_0 = digital.crc32_bb(False, "packet_len", True)
         self.digital_constellation_modulator_0_0 = digital.generic_mod(
@@ -202,7 +203,7 @@ class transmitter(gr.top_block, Qt.QWidget):
             pre_diff_code=True,
             excess_bw=excess_bw,
             verbose=False,
-            log=False,
+            log=True,
             truncate=False)
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
@@ -213,19 +214,19 @@ class transmitter(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_constellation_modulator_0_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.iio_pluto_sink_0, 0))
+        self.connect((self.blocks_throttle2_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.blocks_throttle2_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.digital_constellation_modulator_0_0, 0), (self.fft_filter_xxx_0_0_0_0, 0))
-        self.connect((self.digital_constellation_modulator_0_0, 0), (self.qtgui_const_sink_x_0, 0))
-        self.connect((self.digital_constellation_modulator_0_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
-        self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
+        self.connect((self.epy_block_0_1, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0_0, 0), (self.mmse_resampler_xx_0_0, 0))
         self.connect((self.mmse_resampler_xx_0_0, 0), (self.blocks_throttle2_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "transmitter")
+        self.settings = Qt.QSettings("gnuradio/flowgraphs", "qpsk_with_pluto_tx")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -237,6 +238,16 @@ class transmitter(gr.top_block, Qt.QWidget):
 
     def set_InFile(self, InFile):
         self.InFile = InFile
+
+    def get_usrp_rate(self):
+        return self.usrp_rate
+
+    def set_usrp_rate(self, usrp_rate):
+        self.usrp_rate = usrp_rate
+        self.set_taps(firdes.low_pass(1.0, self.usrp_rate, self.samp_rate/2*0.8, 1000, window.WIN_HAMMING))
+        self.blocks_throttle2_0.set_sample_rate(self.usrp_rate)
+        self.iio_pluto_sink_0.set_samplerate(self.usrp_rate)
+        self.mmse_resampler_xx_0_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
 
     def get_sps(self):
         return self.sps
@@ -251,6 +262,7 @@ class transmitter(gr.top_block, Qt.QWidget):
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
         self.set_low_pass_filter_taps(firdes.low_pass(1.0, self.samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76))
+        self.set_taps(firdes.low_pass(1.0, self.usrp_rate, self.samp_rate/2*0.8, 1000, window.WIN_HAMMING))
         self.mmse_resampler_xx_0_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
         self.qtgui_time_sink_x_1.set_samp_rate(self.samp_rate)
 
@@ -280,13 +292,11 @@ class transmitter(gr.top_block, Qt.QWidget):
     def set_variable_adaptive_algorithm_0(self, variable_adaptive_algorithm_0):
         self.variable_adaptive_algorithm_0 = variable_adaptive_algorithm_0
 
-    def get_usrp_rate(self):
-        return self.usrp_rate
+    def get_taps(self):
+        return self.taps
 
-    def set_usrp_rate(self, usrp_rate):
-        self.usrp_rate = usrp_rate
-        self.blocks_throttle2_0.set_sample_rate(self.usrp_rate)
-        self.mmse_resampler_xx_0_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
+    def set_taps(self, taps):
+        self.taps = taps
 
     def get_rs_ratio(self):
         return self.rs_ratio
@@ -330,15 +340,14 @@ class transmitter(gr.top_block, Qt.QWidget):
 
 
 def argument_parser():
-    description = 'packet transmit'
-    parser = ArgumentParser(description=description)
+    parser = ArgumentParser()
     parser.add_argument(
         "--InFile", dest="InFile", type=str, default='default',
-        help="Set File Name [default=%(default)r]")
+        help="Set message.txt [default=%(default)r]")
     return parser
 
 
-def main(top_block_cls=transmitter, options=None):
+def main(top_block_cls=qpsk_with_pluto_tx, options=None):
     if options is None:
         options = argument_parser().parse_args()
 

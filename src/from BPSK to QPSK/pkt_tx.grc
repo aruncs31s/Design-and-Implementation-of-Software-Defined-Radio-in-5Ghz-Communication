@@ -52,7 +52,7 @@ blocks:
     const_points: '[-1-1j, -1+1j, 1+1j, 1-1j]'
     dims: '1'
     normalization: digital.constellation.AMPLITUDE_NORMALIZATION
-    npwr: '1'
+    npwr: '1.0'
     precision: '8'
     rot_sym: '4'
     soft_dec_lut: None
@@ -382,7 +382,9 @@ blocks:
       \            return (self.f_len)\n\n        return (0)\n\n"
     affinity: ''
     alias: ''
-    comment: ''
+    comment: 'Filename is specified on the command line, e.g.:
+
+      python3 pkt_xmt.py --InFile="../gr-logo.png"'
     maxoutbuf: '0'
     minoutbuf: '0'
   states:
@@ -430,7 +432,7 @@ blocks:
     frequency: int(5e9)
     fstop: '0'
     len_tag_key: packet_len
-    samplerate: usrp_rate
+    samplerate: int(576e3)
     type: fc32
     uri: 192.168.2.1
   states:
