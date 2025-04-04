@@ -331,21 +331,21 @@ blocks:
     alias: ''
     begin_tag: pmt.PMT_NIL
     comment: ''
-    file: message_2.txt
+    file: message.txt
     length: '0'
     maxoutbuf: '0'
     minoutbuf: '0'
     offset: '0'
-    repeat: 'False'
+    repeat: 'True'
     type: byte
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 328.0]
+    coordinate: [16, 392.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_repack_bits_bb_1_0
   id: blocks_repack_bits_bb
   parameters:
@@ -382,9 +382,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [232, 432.0]
+    coordinate: [192, 428.0]
     rotation: 0
-    state: enabled
+    state: disabled
 - name: blocks_tagged_stream_mux_0
   id: blocks_tagged_stream_mux
   parameters:
@@ -734,7 +734,7 @@ blocks:
 - name: epy_block_0
   id: epy_block
   parameters:
-    FileName: '"/home/aruncs/Projects/Design-and-Implementation-of-Software-Defined-Radio-in-5Ghz-Communication/src/QPSK/message.txt"'
+    FileName: '"message.txt"'
     Pkt_len: '60'
     _source_code: "\"\"\"\nEmbedded Python Block: File Source to Tagged Stream\n\"\
       \"\"\n\nimport numpy as np\nfrom gnuradio import gr\nimport time\nimport pmt\n\
@@ -800,9 +800,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [72, 128.0]
+    coordinate: [56, 308.0]
     rotation: 0
-    state: disabled
+    state: enabled
 - name: fec_ber_bf_0
   id: fec_ber_bf
   parameters:
@@ -936,7 +936,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [600, 1000.0]
+    coordinate: [792, 988.0]
     rotation: 0
     state: enabled
 - name: qtgui_const_sink_x_0
@@ -1958,4 +1958,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: 3.10.12.0
+  grc_version: 3.10.10.0

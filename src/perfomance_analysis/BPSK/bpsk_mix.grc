@@ -717,7 +717,7 @@ blocks:
       \            in_sig=None,\n            out_sig=[np.uint8])\n        self.FileName\
       \ = FileName\n        self.Pkt_len = Pkt_len\n        self.state = 0      #\
       \ idle state\n        self.pre_count = 0\n        self.indx = 0\n        self._debug\
-      \ = 1     # debug\n        self.data = \"\"\n\n        if (os.path.exists(self.FileName)):\n\
+      \ = 0     # debug\n        self.data = \"\"\n\n        if (os.path.exists(self.FileName)):\n\
       \            # open input file\n            self.f_in = open (self.FileName,\
       \ 'rb')\n            self._eof = False\n            if (self._debug):\n    \
       \            print (\"File name:\", self.FileName)\n            self.state =\
@@ -806,7 +806,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1392.0, 1104]
+    coordinate: [1416.0, 1200]
     rotation: 270
     state: enabled
 - name: fft_filter_xxx_0_0_0
@@ -935,7 +935,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1328.0, 880]
+    coordinate: [1320.0, 1000]
     rotation: 270
     state: enabled
 - name: pdu_tagged_stream_to_pdu_0
@@ -1717,4 +1717,4 @@ connections:
 
 metadata:
   file_format: 1
-  grc_version: 3.10.12.0
+  grc_version: 3.10.10.0

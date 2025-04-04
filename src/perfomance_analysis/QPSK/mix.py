@@ -7,14 +7,13 @@
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
 # Author: aruncs
-# GNU Radio version: 3.10.12.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
 from PyQt5 import QtCore
 from gnuradio import analog
 from gnuradio import blocks
-import pmt
 from gnuradio import digital
 from gnuradio import fec
 from gnuradio import filter
@@ -28,8 +27,8 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import zeromq
+import mix_epy_block_0 as epy_block_0  # embedded python block
 import sip
-import threading
 
 
 
@@ -56,7 +55,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "mix")
+        self.settings = Qt.QSettings("GNU Radio", "mix")
 
         try:
             geometry = self.settings.value("geometry")
@@ -64,7 +63,6 @@ class mix(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Parameters
@@ -85,7 +83,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.rs_ratio = rs_ratio = 1.040
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), 0.35, 11*sps*nfilts)
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
         self.excess_bw = excess_bw = 0.50
         self.bpsk = bpsk = digital.constellation_qpsk().base()
@@ -437,6 +435,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.fft_filter_xxx_0_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0_0.declare_sample_delay(0)
         self.fec_ber_bf_0 = fec.ber_bf(False, 100, -7.0)
+        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=60)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
         self.digital_pfb_clock_sync_xxx_0 = digital.pfb_clock_sync_ccf(sps, phase_bw, rrc_taps, nfilts, (nfilts/2), 1.5, 2)
         self.digital_map_bb_0 = digital.map_bb([0,1,2,3])
@@ -462,10 +461,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.blocks_uchar_to_float_0_0 = blocks.uchar_to_float()
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
-        self.blocks_stream_to_tagged_stream_0 = blocks.stream_to_tagged_stream(gr.sizeof_char, 1, 60, "packet_len")
         self.blocks_repack_bits_bb_1_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
-        self.blocks_file_source_0 = blocks.file_source(gr.sizeof_char*1, 'message_2.txt', False, 0, 0)
-        self.blocks_file_source_0.set_begin_tag(pmt.PMT_NIL)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, './output.tmp', False)
         self.blocks_file_sink_0.set_unbuffered(True)
         self.blocks_delay_0 = blocks.delay(gr.sizeof_char*1, 800)
@@ -480,10 +476,7 @@ class mix(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.analog_agc_xx_0, 0), (self.digital_pfb_clock_sync_xxx_0, 0))
         self.connect((self.blocks_delay_0, 0), (self.fec_ber_bf_0, 0))
-        self.connect((self.blocks_file_source_0, 0), (self.blocks_stream_to_tagged_stream_0, 0))
         self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.blocks_delay_0, 0))
-        self.connect((self.blocks_stream_to_tagged_stream_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_constellation_modulator_0_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_const_sink_x_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_time_sink_x_1, 0))
@@ -509,6 +502,8 @@ class mix(gr.top_block, Qt.QWidget):
         self.connect((self.digital_map_bb_0, 0), (self.blocks_unpack_k_bits_bb_0, 0))
         self.connect((self.digital_pfb_clock_sync_xxx_0, 0), (self.digital_linear_equalizer_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
+        self.connect((self.epy_block_0, 0), (self.blocks_delay_0, 0))
+        self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fec_ber_bf_0, 0), (self.qtgui_number_sink_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0_0, 0), (self.mmse_resampler_xx_0_0, 0))
         self.connect((self.mmse_resampler_xx_0_0, 0), (self.blocks_throttle2_0, 0))
@@ -517,7 +512,7 @@ class mix(gr.top_block, Qt.QWidget):
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "mix")
+        self.settings = Qt.QSettings("GNU Radio", "mix")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -658,7 +653,6 @@ def main(top_block_cls=mix, options=None):
     tb = top_block_cls(InFile=options.InFile)
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 

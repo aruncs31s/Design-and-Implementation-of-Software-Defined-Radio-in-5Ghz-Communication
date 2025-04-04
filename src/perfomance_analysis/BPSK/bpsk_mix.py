@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: BPSK MIX
 # Author: aruncs
-# GNU Radio version: 3.10.12.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
@@ -30,7 +30,6 @@ from gnuradio import gr, pdu
 from gnuradio import zeromq
 import bpsk_mix_epy_block_0 as epy_block_0  # embedded python block
 import sip
-import threading
 
 
 
@@ -57,7 +56,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "bpsk_mix")
+        self.settings = Qt.QSettings("GNU Radio", "bpsk_mix")
 
         try:
             geometry = self.settings.value("geometry")
@@ -65,7 +64,6 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Parameters
@@ -87,7 +85,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.rx_gain = rx_gain = 50
         self.rs_ratio = rs_ratio = 1.040
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
         self.excess_bw_0 = excess_bw_0 = 0.35
         self.excess_bw = excess_bw = 0.35
@@ -484,7 +482,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "bpsk_mix")
+        self.settings = Qt.QSettings("GNU Radio", "bpsk_mix")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -648,7 +646,6 @@ def main(top_block_cls=bpsk_mix, options=None):
     tb = top_block_cls(InFile=options.InFile)
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 
