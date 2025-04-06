@@ -158,5 +158,3 @@ class blk(gr.sync_block):
         return (0)
 
 
-
-with op
