@@ -105,6 +105,201 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
                 decimation=((int)(usrp_rate/samp_rate)),
                 taps=[],
                 fractional_bw=0)
+        self.qtgui_time_sink_x_4 = qtgui.time_sink_f(
+            1024, #size
+            samp_rate, #samp_rate
+            "Test", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_4.set_update_time(0.10)
+        self.qtgui_time_sink_x_4.set_y_axis(-1, 1)
+
+        self.qtgui_time_sink_x_4.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_4.enable_tags(True)
+        self.qtgui_time_sink_x_4.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_4.enable_autoscale(True)
+        self.qtgui_time_sink_x_4.enable_grid(False)
+        self.qtgui_time_sink_x_4.enable_axis_labels(True)
+        self.qtgui_time_sink_x_4.enable_control_panel(False)
+        self.qtgui_time_sink_x_4.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_4.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_4.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_4.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_4.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_4.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_4.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_4.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_4_win = sip.wrapinstance(self.qtgui_time_sink_x_4.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_4_win)
+        self.qtgui_time_sink_x_3 = qtgui.time_sink_f(
+            1024, #size
+            samp_rate, #samp_rate
+            "After Correlate Access", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_3.set_update_time(0.10)
+        self.qtgui_time_sink_x_3.set_y_axis(-1, 1)
+
+        self.qtgui_time_sink_x_3.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_3.enable_tags(True)
+        self.qtgui_time_sink_x_3.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_3.enable_autoscale(False)
+        self.qtgui_time_sink_x_3.enable_grid(False)
+        self.qtgui_time_sink_x_3.enable_axis_labels(True)
+        self.qtgui_time_sink_x_3.enable_control_panel(False)
+        self.qtgui_time_sink_x_3.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_3.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_3.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_3.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_3.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_3.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_3.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_3.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_3_win = sip.wrapinstance(self.qtgui_time_sink_x_3.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_3_win)
+        self.qtgui_time_sink_x_2 = qtgui.time_sink_f(
+            1024, #size
+            samp_rate, #samp_rate
+            "Before Modulation", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_2.set_update_time(0.10)
+        self.qtgui_time_sink_x_2.set_y_axis(-1, 1)
+
+        self.qtgui_time_sink_x_2.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_2.enable_tags(True)
+        self.qtgui_time_sink_x_2.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_2.enable_autoscale(True)
+        self.qtgui_time_sink_x_2.enable_grid(False)
+        self.qtgui_time_sink_x_2.enable_axis_labels(True)
+        self.qtgui_time_sink_x_2.enable_control_panel(False)
+        self.qtgui_time_sink_x_2.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_2.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_2.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_2.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_2.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_2.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_2.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_2.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_2_win = sip.wrapinstance(self.qtgui_time_sink_x_2.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_2_win)
+        self.qtgui_time_sink_x_1 = qtgui.time_sink_c(
+            1024, #size
+            samp_rate, #samp_rate
+            "Modulated Wave", #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_1.set_update_time(0.10)
+        self.qtgui_time_sink_x_1.set_y_axis(-1, 1)
+
+        self.qtgui_time_sink_x_1.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_1.enable_tags(True)
+        self.qtgui_time_sink_x_1.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
+        self.qtgui_time_sink_x_1.enable_autoscale(True)
+        self.qtgui_time_sink_x_1.enable_grid(True)
+        self.qtgui_time_sink_x_1.enable_axis_labels(True)
+        self.qtgui_time_sink_x_1.enable_control_panel(False)
+        self.qtgui_time_sink_x_1.enable_stem_plot(False)
+
+
+        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
+            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(2):
+            if len(labels[i]) == 0:
+                if (i % 2 == 0):
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Re{{Data {0}}}".format(i/2))
+                else:
+                    self.qtgui_time_sink_x_1.set_line_label(i, "Im{{Data {0}}}".format(i/2))
+            else:
+                self.qtgui_time_sink_x_1.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_1.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_1.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_1.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_1.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_1.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_1_win = sip.wrapinstance(self.qtgui_time_sink_x_1.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_1_win)
         self.qtgui_time_sink_x_0_2 = qtgui.time_sink_f(
             256, #size
             samp_rate, #samp_rate
@@ -351,8 +546,8 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.mmse_resampler_xx_0 = filter.mmse_resampler_cc(0, (1.0/((usrp_rate/samp_rate)*rs_ratio)))
         self.fft_filter_xxx_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0.declare_sample_delay(0)
-        self.epy_block_3 = epy_block_3.blk(reference_bits_path='tx_bits.bin', log_file='snr_log.txt')
-        self.epy_block_2 = epy_block_2.blk(reference_bits_path="tx_bits.bin", log_file_path="ber_log.csv")
+        self.epy_block_3 = epy_block_3.blk(reference_bits_path='tx_bits.bin', log_file='data/snr_log.txt')
+        self.epy_block_2 = epy_block_2.blk(reference_bits_path="tx_bits.bin", log_file_path="data/ber_log.csv")
         self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=52)
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_MUELLER_AND_MULLER,
@@ -385,9 +580,14 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
             log=False,
             truncate=False)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(bpsk)
+        self.blocks_unpacked_to_packed_xx_0 = blocks.unpacked_to_packed_bb(8, gr.GR_MSB_FIRST)
+        self.blocks_uchar_to_float_2 = blocks.uchar_to_float()
+        self.blocks_uchar_to_float_1 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0_0_0 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0_0 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0 = blocks.uchar_to_float()
+        self.blocks_uchar_to_float_0 = blocks.uchar_to_float()
+        self.blocks_throttle2_1_2 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_1_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_1_0 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
@@ -397,9 +597,9 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.blocks_repack_bits_bb_1_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_message_debug_0 = blocks.message_debug(False, gr.log_levels.trace)
-        self.blocks_file_sink_2 = blocks.file_sink(gr.sizeof_char*1, 'rx_bits.bin', False)
+        self.blocks_file_sink_2 = blocks.file_sink(gr.sizeof_char*1, 'data/rx_bits.bin', False)
         self.blocks_file_sink_2.set_unbuffered(False)
-        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\arunc\\Git\\Design-and-Implementation-of-Software-Defined-Radio-in-5Ghz-Communication\\src\\perfomance_analysis\\BPSK\\tx_bits.bin', False)
+        self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'data/tx_bits.bin', False)
         self.blocks_file_sink_1.set_unbuffered(False)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, './output.tmp', False)
         self.blocks_file_sink_0.set_unbuffered(True)
@@ -412,8 +612,11 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.msg_connect((self.epy_block_2, 'ber_out'), (self.blocks_message_debug_0, 'print'))
         self.connect((self.analog_agc_xx_0, 0), (self.digital_fll_band_edge_cc_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.blocks_uchar_to_float_0_0_0_0, 0))
+        self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.blocks_uchar_to_float_1, 0))
         self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.digital_crc32_bb_0_0, 0))
+        self.connect((self.blocks_tagged_stream_mux_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.blocks_repack_bits_bb_0_0, 0))
+        self.connect((self.blocks_tagged_stream_mux_0, 0), (self.blocks_uchar_to_float_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_constellation_modulator_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.analog_agc_xx_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_freq_sink_x_0, 0))
@@ -421,9 +624,14 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_throttle2_1, 0), (self.qtgui_time_sink_x_0, 0))
         self.connect((self.blocks_throttle2_1_0, 0), (self.qtgui_time_sink_x_0_2, 0))
         self.connect((self.blocks_throttle2_1_1, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.blocks_throttle2_1_2, 0), (self.qtgui_time_sink_x_1, 0))
+        self.connect((self.blocks_uchar_to_float_0, 0), (self.qtgui_time_sink_x_2, 0))
         self.connect((self.blocks_uchar_to_float_0_0, 0), (self.blocks_throttle2_1_0, 0))
         self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.blocks_throttle2_1_1, 0))
         self.connect((self.blocks_uchar_to_float_0_0_0_0, 0), (self.blocks_throttle2_1, 0))
+        self.connect((self.blocks_uchar_to_float_1, 0), (self.qtgui_time_sink_x_3, 0))
+        self.connect((self.blocks_uchar_to_float_2, 0), (self.qtgui_time_sink_x_4, 0))
+        self.connect((self.blocks_unpacked_to_packed_xx_0, 0), (self.blocks_file_sink_2, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_diff_decoder_bb_0, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.epy_block_3, 0))
         self.connect((self.digital_constellation_modulator_0, 0), (self.fft_filter_xxx_0_0_0, 0))
@@ -432,20 +640,21 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.epy_block_2, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_constellation_decoder_cb_0, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_const_sink_x_0, 0))
-        self.connect((self.digital_crc32_bb_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.digital_crc32_bb_0_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.digital_diff_decoder_bb_0, 0), (self.digital_map_bb_0, 0))
         self.connect((self.digital_fll_band_edge_cc_0, 0), (self.digital_symbol_sync_xx_0, 0))
-        self.connect((self.digital_map_bb_0, 0), (self.blocks_file_sink_2, 0))
         self.connect((self.digital_map_bb_0, 0), (self.blocks_uchar_to_float_0_0, 0))
+        self.connect((self.digital_map_bb_0, 0), (self.blocks_uchar_to_float_2, 0))
+        self.connect((self.digital_map_bb_0, 0), (self.blocks_unpacked_to_packed_xx_0, 0))
         self.connect((self.digital_map_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
         self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0, 0), (self.mmse_resampler_xx_0, 0))
         self.connect((self.mmse_resampler_xx_0, 0), (self.blocks_throttle2_0_0, 0))
+        self.connect((self.mmse_resampler_xx_0, 0), (self.blocks_throttle2_1_2, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.blocks_throttle2_0, 0))
         self.connect((self.zeromq_sub_source_0, 0), (self.rational_resampler_xxx_0, 0))
         self.connect((self.zeromq_sub_source_1, 0), (self.zeromq_pub_sink_1, 0))
@@ -474,6 +683,10 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
         self.qtgui_time_sink_x_0_2.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_1.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_2.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_3.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_4.set_samp_rate(self.samp_rate)
 
     def get_access_key(self):
         return self.access_key
@@ -494,6 +707,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
     def set_usrp_rate(self, usrp_rate):
         self.usrp_rate = usrp_rate
         self.blocks_throttle2_0_0.set_sample_rate(self.usrp_rate)
+        self.blocks_throttle2_1_2.set_sample_rate(self.usrp_rate)
         self.mmse_resampler_xx_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
 
     def get_thresh(self):

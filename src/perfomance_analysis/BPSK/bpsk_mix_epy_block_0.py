@@ -82,7 +82,7 @@ class blk(gr.sync_block):
 
         elif (self.state == 2):
             while (not (self._eof)):
-                buff = self.f_in.read (self.Pkt_len)
+                buff = self.f_in.read(self.Pkt_len)
                 b_len = len(buff)
                 if b_len == 0:
                     print ('End of file')
@@ -92,7 +92,7 @@ class blk(gr.sync_block):
                     self.pre_count = 0
                     break
                 # convert to Base64
-                encoded = base64.b64encode (buff)
+                encoded = base64.b64encode(buff)
                 e_len = len(encoded)
                 if (self._debug):
                     print ('b64 length =', e_len)
