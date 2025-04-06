@@ -51,11 +51,11 @@ while True:
         buff = f_in.read(4)
         b_len = len(buff)
         if b_len == 0:
-            # print ('End of file')
+            print ('End of file')
             break
         if (buff[0] == 37):     # '%'
             if (buff == b'%UUU'):
-                # print ("End of text")
+                print ("End of text")
                 buff = f_in.read(4)     # skip next four 'U's
                 rcv_fn = []
                 i = 0
@@ -71,7 +71,7 @@ while True:
                     rcv_fn[x] = str((chr)(rcv_fn[x]))
                     x += 1
                 ofn = "".join(rcv_fn)
-                print ("Transmitted file : message.txt")
+                print ("Transmitted file name:",ofn)
                 state = 2
                 break
         else:

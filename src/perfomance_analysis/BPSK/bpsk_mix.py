@@ -7,13 +7,14 @@
 # GNU Radio Python Flow Graph
 # Title: BPSK MIX
 # Author: aruncs
-# GNU Radio version: 3.10.10.0
+# GNU Radio version: 3.10.12.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
 from PyQt5 import QtCore
 from gnuradio import analog
 from gnuradio import blocks
+from gnuradio import blocks, gr
 from gnuradio import channels
 from gnuradio.filter import firdes
 from gnuradio import digital
@@ -28,13 +29,16 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import zeromq
 import bpsk_mix_epy_block_0 as epy_block_0  # embedded python block
+import bpsk_mix_epy_block_2 as epy_block_2  # embedded python block
+import bpsk_mix_epy_block_3 as epy_block_3  # embedded python block
 import sip
+import threading
 
 
 
 class bpsk_mix(gr.top_block, Qt.QWidget):
 
-    def __init__(self, InFile='default'):
+    def __init__(self):
         gr.top_block.__init__(self, "BPSK MIX", catch_exceptions=True)
         Qt.QWidget.__init__(self)
         self.setWindowTitle("BPSK MIX")
@@ -55,7 +59,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "bpsk_mix")
+        self.settings = Qt.QSettings("gnuradio/flowgraphs", "bpsk_mix")
 
         try:
             geometry = self.settings.value("geometry")
@@ -63,11 +67,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-
-        ##################################################
-        # Parameters
-        ##################################################
-        self.InFile = InFile
+        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Variables
@@ -77,19 +77,14 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.usrp_rate_0 = usrp_rate_0 = 768000
         self.usrp_rate = usrp_rate = 768000
         self.thresh = thresh = 1
-        self.sps_0 = sps_0 = 4
         self.sps = sps = 4
-        self.samp_rate_1 = samp_rate_1 = 48000
-        self.samp_rate_0 = samp_rate_0 = 48000
         self.rx_gain = rx_gain = 50
         self.rs_ratio = rs_ratio = 1.040
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
         self.excess_bw_0 = excess_bw_0 = 0.35
         self.excess_bw = excess_bw = 0.35
-        self.bpsk_0 = bpsk_0 = digital.constellation_bpsk().base()
-        self.bpsk_0.set_npwr(1.0)
         self.bpsk = bpsk = digital.constellation_bpsk().base()
         self.bpsk.set_npwr(1)
         self.MTU = MTU = 1500
@@ -356,7 +351,9 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.mmse_resampler_xx_0 = filter.mmse_resampler_cc(0, (1.0/((usrp_rate/samp_rate)*rs_ratio)))
         self.fft_filter_xxx_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0.declare_sample_delay(0)
-        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=60)
+        self.epy_block_3 = epy_block_3.blk(reference_bits_path='tx_bits.bin', log_file='snr_log.txt')
+        self.epy_block_2 = epy_block_2.blk(reference_bits_path="tx_bits.bin", log_file_path="ber_log.csv")
+        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=52)
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_MUELLER_AND_MULLER,
             sps,
@@ -388,21 +385,18 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
             log=False,
             truncate=False)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(bpsk)
-        self.channels_channel_model_0 = channels.channel_model(
-            noise_voltage=0.316,
-            frequency_offset=0.01,
-            epsilon=1,
-            taps=[1.0+0j],
-            noise_seed=0,
-            block_tags=True)
         self.blocks_uchar_to_float_0_0_0_0 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0_0 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0 = blocks.uchar_to_float()
+        self.blocks_throttle2_1_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
+        self.blocks_throttle2_1_0 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
+        self.blocks_throttle2_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_0_0 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
         self.blocks_repack_bits_bb_1_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_repack_bits_bb_0_0 = blocks.repack_bits_bb(8, 1, "packet_len", False, gr.GR_MSB_FIRST)
+        self.blocks_message_debug_0 = blocks.message_debug(False, gr.log_levels.trace)
         self.blocks_file_sink_2 = blocks.file_sink(gr.sizeof_char*1, 'rx_bits.bin', False)
         self.blocks_file_sink_2.set_unbuffered(False)
         self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'C:\\Users\\arunc\\Git\\Design-and-Implementation-of-Software-Defined-Radio-in-5Ghz-Communication\\src\\perfomance_analysis\\BPSK\\tx_bits.bin', False)
@@ -415,6 +409,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
+        self.msg_connect((self.epy_block_2, 'ber_out'), (self.blocks_message_debug_0, 'print'))
         self.connect((self.analog_agc_xx_0, 0), (self.digital_fll_band_edge_cc_0, 0))
         self.connect((self.blocks_repack_bits_bb_0_0, 0), (self.blocks_uchar_to_float_0_0_0_0, 0))
         self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.digital_crc32_bb_0_0, 0))
@@ -423,16 +418,21 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_throttle2_0, 0), (self.analog_agc_xx_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_throttle2_0_0, 0), (self.zeromq_pub_sink_0, 0))
-        self.connect((self.blocks_uchar_to_float_0_0, 0), (self.qtgui_time_sink_x_0_2, 0))
-        self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
-        self.connect((self.blocks_uchar_to_float_0_0_0_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.channels_channel_model_0, 0), (self.zeromq_pub_sink_1, 0))
+        self.connect((self.blocks_throttle2_1, 0), (self.qtgui_time_sink_x_0, 0))
+        self.connect((self.blocks_throttle2_1_0, 0), (self.qtgui_time_sink_x_0_2, 0))
+        self.connect((self.blocks_throttle2_1_1, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.blocks_uchar_to_float_0_0, 0), (self.blocks_throttle2_1_0, 0))
+        self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.blocks_throttle2_1_1, 0))
+        self.connect((self.blocks_uchar_to_float_0_0_0_0, 0), (self.blocks_throttle2_1, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_diff_decoder_bb_0, 0))
+        self.connect((self.digital_constellation_decoder_cb_0, 0), (self.epy_block_3, 0))
         self.connect((self.digital_constellation_modulator_0, 0), (self.fft_filter_xxx_0_0_0, 0))
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.blocks_repack_bits_bb_1_0, 0))
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.blocks_uchar_to_float_0_0_0, 0))
+        self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.epy_block_2, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_constellation_decoder_cb_0, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_const_sink_x_0, 0))
+        self.connect((self.digital_crc32_bb_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.digital_crc32_bb_0_0, 0), (self.blocks_file_sink_0, 0))
@@ -443,28 +443,21 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.digital_map_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
         self.connect((self.digital_symbol_sync_xx_0, 0), (self.digital_costas_loop_cc_0, 0))
-        self.connect((self.epy_block_0, 0), (self.blocks_file_sink_1, 0))
         self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0, 0), (self.mmse_resampler_xx_0, 0))
         self.connect((self.mmse_resampler_xx_0, 0), (self.blocks_throttle2_0_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.blocks_throttle2_0, 0))
         self.connect((self.zeromq_sub_source_0, 0), (self.rational_resampler_xxx_0, 0))
-        self.connect((self.zeromq_sub_source_1, 0), (self.channels_channel_model_0, 0))
+        self.connect((self.zeromq_sub_source_1, 0), (self.zeromq_pub_sink_1, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "bpsk_mix")
+        self.settings = Qt.QSettings("gnuradio/flowgraphs", "bpsk_mix")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
 
         event.accept()
-
-    def get_InFile(self):
-        return self.InFile
-
-    def set_InFile(self, InFile):
-        self.InFile = InFile
 
     def get_samp_rate(self):
         return self.samp_rate
@@ -473,6 +466,9 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.set_low_pass_filter_taps(firdes.low_pass(1.0, self.samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76))
         self.blocks_throttle2_0.set_sample_rate(self.samp_rate)
+        self.blocks_throttle2_1.set_sample_rate(self.samp_rate)
+        self.blocks_throttle2_1_0.set_sample_rate(self.samp_rate)
+        self.blocks_throttle2_1_1.set_sample_rate(self.samp_rate)
         self.mmse_resampler_xx_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
         self.qtgui_freq_sink_x_0.set_frequency_range(0, self.samp_rate)
         self.qtgui_time_sink_x_0.set_samp_rate(self.samp_rate)
@@ -506,30 +502,12 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
     def set_thresh(self, thresh):
         self.thresh = thresh
 
-    def get_sps_0(self):
-        return self.sps_0
-
-    def set_sps_0(self, sps_0):
-        self.sps_0 = sps_0
-
     def get_sps(self):
         return self.sps
 
     def set_sps(self, sps):
         self.sps = sps
         self.digital_symbol_sync_xx_0.set_sps(self.sps)
-
-    def get_samp_rate_1(self):
-        return self.samp_rate_1
-
-    def set_samp_rate_1(self, samp_rate_1):
-        self.samp_rate_1 = samp_rate_1
-
-    def get_samp_rate_0(self):
-        return self.samp_rate_0
-
-    def set_samp_rate_0(self, samp_rate_0):
-        self.samp_rate_0 = samp_rate_0
 
     def get_rx_gain(self):
         return self.rx_gain
@@ -579,12 +557,6 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
     def set_excess_bw(self, excess_bw):
         self.excess_bw = excess_bw
 
-    def get_bpsk_0(self):
-        return self.bpsk_0
-
-    def set_bpsk_0(self, bpsk_0):
-        self.bpsk_0 = bpsk_0
-
     def get_bpsk(self):
         return self.bpsk
 
@@ -600,23 +572,15 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
 
 
 
-def argument_parser():
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--InFile", dest="InFile", type=str, default='default',
-        help="Set File Name [default=%(default)r]")
-    return parser
-
 
 def main(top_block_cls=bpsk_mix, options=None):
-    if options is None:
-        options = argument_parser().parse_args()
 
     qapp = Qt.QApplication(sys.argv)
 
-    tb = top_block_cls(InFile=options.InFile)
+    tb = top_block_cls()
 
     tb.start()
+    tb.flowgraph_started.set()
 
     tb.show()
 
