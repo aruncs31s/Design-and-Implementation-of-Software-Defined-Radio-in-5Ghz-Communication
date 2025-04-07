@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: Receiver Flow
 # Description: packet receive
-# GNU Radio version: 3.10.12.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
@@ -26,7 +26,6 @@ from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import iio
 import sip
-import threading
 
 
 
@@ -53,7 +52,7 @@ class receiver(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "receiver")
+        self.settings = Qt.QSettings("GNU Radio", "receiver")
 
         try:
             geometry = self.settings.value("geometry")
@@ -61,7 +60,6 @@ class receiver(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Parameters
@@ -83,7 +81,7 @@ class receiver(gr.top_block, Qt.QWidget):
         self.rs_ratio = rs_ratio = 1.040
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), 0.35, 11*sps*nfilts)
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
         self.excess_bw = excess_bw = 0.35
         self.delay = delay = 50
@@ -100,6 +98,54 @@ class receiver(gr.top_block, Qt.QWidget):
                 decimation=((int)(usrp_rate/samp_rate)),
                 taps=[],
                 fractional_bw=0)
+        self.qtgui_time_sink_x_0_2_0 = qtgui.time_sink_f(
+            256, #size
+            samp_rate, #samp_rate
+            'demod bits', #name
+            1, #number of inputs
+            None # parent
+        )
+        self.qtgui_time_sink_x_0_2_0.set_update_time(0.10)
+        self.qtgui_time_sink_x_0_2_0.set_y_axis(-0.1, 1.1)
+
+        self.qtgui_time_sink_x_0_2_0.set_y_label('Amplitude', "")
+
+        self.qtgui_time_sink_x_0_2_0.enable_tags(True)
+        self.qtgui_time_sink_x_0_2_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.2, 0.0, 0, "packet_len")
+        self.qtgui_time_sink_x_0_2_0.enable_autoscale(True)
+        self.qtgui_time_sink_x_0_2_0.enable_grid(False)
+        self.qtgui_time_sink_x_0_2_0.enable_axis_labels(True)
+        self.qtgui_time_sink_x_0_2_0.enable_control_panel(False)
+        self.qtgui_time_sink_x_0_2_0.enable_stem_plot(False)
+
+
+        labels = ['', '', '', '', '',
+            '', '', '', '', '']
+        widths = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        colors = ['blue', 'red', 'green', 'black', 'cyan',
+            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
+        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
+            1.0, 1.0, 1.0, 1.0, 1.0]
+        styles = [1, 1, 1, 1, 1,
+            1, 1, 1, 1, 1]
+        markers = [-1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1]
+
+
+        for i in range(1):
+            if len(labels[i]) == 0:
+                self.qtgui_time_sink_x_0_2_0.set_line_label(i, "Data {0}".format(i))
+            else:
+                self.qtgui_time_sink_x_0_2_0.set_line_label(i, labels[i])
+            self.qtgui_time_sink_x_0_2_0.set_line_width(i, widths[i])
+            self.qtgui_time_sink_x_0_2_0.set_line_color(i, colors[i])
+            self.qtgui_time_sink_x_0_2_0.set_line_style(i, styles[i])
+            self.qtgui_time_sink_x_0_2_0.set_line_marker(i, markers[i])
+            self.qtgui_time_sink_x_0_2_0.set_line_alpha(i, alphas[i])
+
+        self._qtgui_time_sink_x_0_2_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0_2_0.qwidget(), Qt.QWidget)
+        self.top_layout.addWidget(self._qtgui_time_sink_x_0_2_0_win)
         self.qtgui_time_sink_x_0_0 = qtgui.time_sink_f(
             256, #size
             samp_rate, #samp_rate
@@ -220,6 +266,7 @@ class receiver(gr.top_block, Qt.QWidget):
         for c in range(3, 4):
             self.top_grid_layout.setColumnStretch(c, 1)
         self.blocks_unpack_k_bits_bb_0 = blocks.unpack_k_bits_bb(2)
+        self.blocks_uchar_to_float_0_0_1 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0_0 = blocks.uchar_to_float()
         self.blocks_repack_bits_bb_1_0 = blocks.repack_bits_bb(1, 8, "packet_len", False, gr.GR_MSB_FIRST)
         self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, './output.tmp', False)
@@ -231,6 +278,8 @@ class receiver(gr.top_block, Qt.QWidget):
         ##################################################
         self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.digital_crc32_bb_0_0, 0))
         self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
+        self.connect((self.blocks_uchar_to_float_0_0_1, 0), (self.qtgui_time_sink_x_0_2_0, 0))
+        self.connect((self.blocks_unpack_k_bits_bb_0, 0), (self.blocks_uchar_to_float_0_0_1, 0))
         self.connect((self.blocks_unpack_k_bits_bb_0, 0), (self.digital_correlate_access_code_xx_ts_0, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_diff_decoder_bb_0, 0))
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.blocks_repack_bits_bb_1_0, 0))
@@ -247,7 +296,7 @@ class receiver(gr.top_block, Qt.QWidget):
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "receiver")
+        self.settings = Qt.QSettings("GNU Radio", "receiver")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -274,6 +323,7 @@ class receiver(gr.top_block, Qt.QWidget):
         self.samp_rate = samp_rate
         self.set_low_pass_filter_taps(firdes.low_pass(1.0, self.samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76))
         self.qtgui_time_sink_x_0_0.set_samp_rate(self.samp_rate)
+        self.qtgui_time_sink_x_0_2_0.set_samp_rate(self.samp_rate)
 
     def get_qpsk(self):
         return self.qpsk
@@ -391,7 +441,6 @@ def main(top_block_cls=receiver, options=None):
     tb = top_block_cls(InFile=options.InFile)
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 

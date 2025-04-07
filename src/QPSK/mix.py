@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
 # Author: aruncs
-# GNU Radio version: 3.10.12.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
@@ -25,10 +25,8 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import iio
-from gnuradio import zeromq
 import mix_epy_block_0 as epy_block_0  # embedded python block
 import sip
-import threading
 
 
 
@@ -55,7 +53,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "mix")
+        self.settings = Qt.QSettings("GNU Radio", "mix")
 
         try:
             geometry = self.settings.value("geometry")
@@ -63,7 +61,6 @@ class mix(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Parameters
@@ -84,9 +81,9 @@ class mix(gr.top_block, Qt.QWidget):
         self.rs_ratio = rs_ratio = 1.040
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), 0.35, 11*sps*nfilts)
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
-        self.excess_bw = excess_bw = 0.50
+        self.excess_bw = excess_bw = 0.350
         self.bpsk = bpsk = digital.constellation_qpsk().base()
         self.bpsk.set_npwr(1)
 
@@ -94,7 +91,6 @@ class mix(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
 
-        self.zeromq_sub_source_0 = zeromq.sub_source(gr.sizeof_gr_complex, 1, 'tcp://127.0.0.1:49210', 100, False, (-1), '', False)
         self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
                 interpolation=1,
                 decimation=((int)(usrp_rate/samp_rate)),
@@ -386,25 +382,35 @@ class mix(gr.top_block, Qt.QWidget):
         self._qtgui_const_sink_x_0_win = sip.wrapinstance(self.qtgui_const_sink_x_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_const_sink_x_0_win)
         self.mmse_resampler_xx_0_0 = filter.mmse_resampler_cc(0, (1.0/((usrp_rate/samp_rate)*rs_ratio)))
-        self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768, False)
-        self.iio_pluto_sink_0.set_len_tag_key('')
-        self.iio_pluto_sink_0.set_bandwidth(20000000)
-        self.iio_pluto_sink_0.set_frequency(int(5e9))
-        self.iio_pluto_sink_0.set_samplerate(usrp_rate)
-        self.iio_pluto_sink_0.set_attenuation(0, 0)
-        self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
+        self.iio_pluto_source_0_0 = iio.fmcomms2_source_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768)
+        self.iio_pluto_source_0_0.set_len_tag_key('packet_len')
+        self.iio_pluto_source_0_0.set_frequency(int(2e9))
+        self.iio_pluto_source_0_0.set_samplerate(768000)
+        self.iio_pluto_source_0_0.set_gain_mode(0, 'slow_attack')
+        self.iio_pluto_source_0_0.set_gain(0, 64)
+        self.iio_pluto_source_0_0.set_quadrature(True)
+        self.iio_pluto_source_0_0.set_rfdc(True)
+        self.iio_pluto_source_0_0.set_bbdc(True)
+        self.iio_pluto_source_0_0.set_filter_params('Auto', '', 0, 0)
+        self.iio_pluto_sink_0_0 = iio.fmcomms2_sink_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768, False)
+        self.iio_pluto_sink_0_0.set_len_tag_key('packet_len')
+        self.iio_pluto_sink_0_0.set_bandwidth(20000000)
+        self.iio_pluto_sink_0_0.set_frequency(int(2e9))
+        self.iio_pluto_sink_0_0.set_samplerate(usrp_rate)
+        self.iio_pluto_sink_0_0.set_attenuation(0, 10.0)
+        self.iio_pluto_sink_0_0.set_filter_params('Auto', '', 0, 0)
         self.fft_filter_xxx_0_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0_0.declare_sample_delay(0)
-        self.epy_block_0 = epy_block_0.blk(FileName="/home/aruncs/Projects/Design-and-Implementation-of-Software-Defined-Radio-in-5Ghz-Communication/src/QPSK/message.txt", Pkt_len=60)
+        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=52)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
         self.digital_pfb_clock_sync_xxx_0 = digital.pfb_clock_sync_ccf(sps, phase_bw, rrc_taps, nfilts, (nfilts/2), 1.5, 2)
         self.digital_map_bb_0 = digital.map_bb([0,1,2,3])
-        self.digital_linear_equalizer_0 = digital.linear_equalizer(16, 2, variable_adaptive_algorithm_0, True, [ ], 'corr_est')
+        self.digital_linear_equalizer_0 = digital.linear_equalizer(31, 2, variable_adaptive_algorithm_0, True, [ ], 'corr_est')
         self.digital_diff_decoder_bb_0 = digital.diff_decoder_bb(4, digital.DIFF_DIFFERENTIAL)
         self.digital_crc32_bb_0_0 = digital.crc32_bb(True, "packet_len", True)
         self.digital_crc32_bb_0 = digital.crc32_bb(False, "packet_len", True)
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc(phase_bw, 4, True)
-        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts("1110000101011010111010001001001111100001010110101110100010010011",
+        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts(access_key,
           1, 'packet_len')
         self.digital_constellation_modulator_0_0 = digital.generic_mod(
             constellation=qpsk,
@@ -434,7 +440,7 @@ class mix(gr.top_block, Qt.QWidget):
         self.connect((self.analog_agc_xx_0, 0), (self.digital_pfb_clock_sync_xxx_0, 0))
         self.connect((self.blocks_repack_bits_bb_1_0, 0), (self.digital_crc32_bb_0_0, 0))
         self.connect((self.blocks_tagged_stream_mux_0, 0), (self.digital_constellation_modulator_0_0, 0))
-        self.connect((self.blocks_throttle2_0, 0), (self.iio_pluto_sink_0, 0))
+        self.connect((self.blocks_throttle2_0, 0), (self.iio_pluto_sink_0_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_const_sink_x_0, 0))
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.blocks_uchar_to_float_0_0, 0), (self.qtgui_time_sink_x_0_2, 0))
@@ -459,13 +465,13 @@ class mix(gr.top_block, Qt.QWidget):
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
         self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0_0, 0), (self.mmse_resampler_xx_0_0, 0))
+        self.connect((self.iio_pluto_source_0_0, 0), (self.rational_resampler_xxx_0, 0))
         self.connect((self.mmse_resampler_xx_0_0, 0), (self.blocks_throttle2_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.analog_agc_xx_0, 0))
-        self.connect((self.zeromq_sub_source_0, 0), (self.rational_resampler_xxx_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "mix")
+        self.settings = Qt.QSettings("GNU Radio", "mix")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -530,7 +536,7 @@ class mix(gr.top_block, Qt.QWidget):
     def set_usrp_rate(self, usrp_rate):
         self.usrp_rate = usrp_rate
         self.blocks_throttle2_0.set_sample_rate(self.usrp_rate)
-        self.iio_pluto_sink_0.set_samplerate(self.usrp_rate)
+        self.iio_pluto_sink_0_0.set_samplerate(self.usrp_rate)
         self.mmse_resampler_xx_0_0.set_resamp_ratio((1.0/((self.usrp_rate/self.samp_rate)*self.rs_ratio)))
 
     def get_rs_ratio(self):
@@ -601,7 +607,6 @@ def main(top_block_cls=mix, options=None):
     tb = top_block_cls(InFile=options.InFile)
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 

@@ -7,7 +7,7 @@
 # GNU Radio Python Flow Graph
 # Title: QPSK Pluto Receiver
 # Author: aruncs
-# GNU Radio version: 3.10.12.0
+# GNU Radio version: 3.10.10.0
 
 from PyQt5 import Qt
 from gnuradio import qtgui
@@ -24,9 +24,8 @@ from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
 from gnuradio import iio
-import qpsk_with_pluto_tx_epy_block_0_1 as epy_block_0_1  # embedded python block
+import qpsk_with_pluto_tx_epy_block_0 as epy_block_0  # embedded python block
 import sip
-import threading
 
 
 
@@ -53,7 +52,7 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "qpsk_with_pluto_tx")
+        self.settings = Qt.QSettings("GNU Radio", "qpsk_with_pluto_tx")
 
         try:
             geometry = self.settings.value("geometry")
@@ -61,7 +60,6 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
                 self.restoreGeometry(geometry)
         except BaseException as exc:
             print(f"Qt GUI: Could not restore geometry: {str(exc)}", file=sys.stderr)
-        self.flowgraph_started = threading.Event()
 
         ##################################################
         # Parameters
@@ -80,12 +78,15 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
         self.access_key = access_key = "1110000101011010111010001001001111100001010110101110100010010011"
         self.variable_adaptive_algorithm_0 = variable_adaptive_algorithm_0 = digital.adaptive_algorithm_cma( qpsk, .0001, 4).base()
         self.taps = taps = firdes.low_pass(1.0, usrp_rate, samp_rate/2*0.8, 1000, window.WIN_HAMMING)
+        self.sps_0 = sps_0 = 4
         self.rs_ratio = rs_ratio = 1.040
         self.rrc_taps = rrc_taps = firdes.root_raised_cosine(nfilts, nfilts, 1.0/float(sps), 0.35, 11*sps*nfilts)
         self.phase_bw = phase_bw = 0.0628
-        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000, 2000, window.WIN_HAMMING, 6.76)
+        self.low_pass_filter_taps = low_pass_filter_taps = firdes.low_pass(1.0, samp_rate, 20000,2000, window.WIN_HAMMING, 6.76)
         self.hdr_format = hdr_format = digital.header_format_default(access_key, 0)
-        self.excess_bw = excess_bw = 0.35
+        self.excess_bw = excess_bw = 0.50
+        self.bpsk = bpsk = digital.constellation_qpsk().base()
+        self.bpsk.set_npwr(1)
 
         ##################################################
         # Blocks
@@ -185,15 +186,15 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
         self.top_layout.addWidget(self._qtgui_const_sink_x_0_win)
         self.mmse_resampler_xx_0_0 = filter.mmse_resampler_cc(0, (1.0/((usrp_rate/samp_rate)*rs_ratio)))
         self.iio_pluto_sink_0 = iio.fmcomms2_sink_fc32('192.168.2.1' if '192.168.2.1' else iio.get_pluto_uri(), [True, True], 32768, False)
-        self.iio_pluto_sink_0.set_len_tag_key('packet_len')
+        self.iio_pluto_sink_0.set_len_tag_key('')
         self.iio_pluto_sink_0.set_bandwidth(20000000)
         self.iio_pluto_sink_0.set_frequency(int(5e9))
         self.iio_pluto_sink_0.set_samplerate(usrp_rate)
-        self.iio_pluto_sink_0.set_attenuation(0, 10.0)
+        self.iio_pluto_sink_0.set_attenuation(0, 0)
         self.iio_pluto_sink_0.set_filter_params('Auto', '', 0, 0)
         self.fft_filter_xxx_0_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0_0.declare_sample_delay(0)
-        self.epy_block_0_1 = epy_block_0_1.blk(FileName="message.txt", Pkt_len=60)
+        self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=60)
         self.digital_protocol_formatter_bb_0 = digital.protocol_formatter_bb(hdr_format, "packet_len")
         self.digital_crc32_bb_0 = digital.crc32_bb(False, "packet_len", True)
         self.digital_constellation_modulator_0_0 = digital.generic_mod(
@@ -203,7 +204,7 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
             pre_diff_code=True,
             excess_bw=excess_bw,
             verbose=False,
-            log=True,
+            log=False,
             truncate=False)
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_tagged_stream_mux_0 = blocks.tagged_stream_mux(gr.sizeof_char*1, 'packet_len', 0)
@@ -220,13 +221,13 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.digital_protocol_formatter_bb_0, 0), (self.blocks_tagged_stream_mux_0, 0))
-        self.connect((self.epy_block_0_1, 0), (self.digital_crc32_bb_0, 0))
+        self.connect((self.epy_block_0, 0), (self.digital_crc32_bb_0, 0))
         self.connect((self.fft_filter_xxx_0_0_0_0, 0), (self.mmse_resampler_xx_0_0, 0))
         self.connect((self.mmse_resampler_xx_0_0, 0), (self.blocks_throttle2_0, 0))
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("gnuradio/flowgraphs", "qpsk_with_pluto_tx")
+        self.settings = Qt.QSettings("GNU Radio", "qpsk_with_pluto_tx")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -298,6 +299,12 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
     def set_taps(self, taps):
         self.taps = taps
 
+    def get_sps_0(self):
+        return self.sps_0
+
+    def set_sps_0(self, sps_0):
+        self.sps_0 = sps_0
+
     def get_rs_ratio(self):
         return self.rs_ratio
 
@@ -337,13 +344,19 @@ class qpsk_with_pluto_tx(gr.top_block, Qt.QWidget):
     def set_excess_bw(self, excess_bw):
         self.excess_bw = excess_bw
 
+    def get_bpsk(self):
+        return self.bpsk
+
+    def set_bpsk(self, bpsk):
+        self.bpsk = bpsk
+
 
 
 def argument_parser():
     parser = ArgumentParser()
     parser.add_argument(
         "--InFile", dest="InFile", type=str, default='default',
-        help="Set message.txt [default=%(default)r]")
+        help="Set File Name [default=%(default)r]")
     return parser
 
 
@@ -356,7 +369,6 @@ def main(top_block_cls=qpsk_with_pluto_tx, options=None):
     tb = top_block_cls(InFile=options.InFile)
 
     tb.start()
-    tb.flowgraph_started.set()
 
     tb.show()
 
