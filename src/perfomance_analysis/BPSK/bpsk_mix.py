@@ -74,7 +74,6 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         ##################################################
         self.samp_rate = samp_rate = 48000
         self.access_key = access_key = '11100001010110101110100010010011'
-        self.usrp_rate_0 = usrp_rate_0 = 768000
         self.usrp_rate = usrp_rate = 768000
         self.thresh = thresh = 1
         self.sps = sps = 4
@@ -167,7 +166,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
 
         self.qtgui_time_sink_x_3.enable_tags(True)
         self.qtgui_time_sink_x_3.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
-        self.qtgui_time_sink_x_3.enable_autoscale(False)
+        self.qtgui_time_sink_x_3.enable_autoscale(True)
         self.qtgui_time_sink_x_3.enable_grid(False)
         self.qtgui_time_sink_x_3.enable_axis_labels(True)
         self.qtgui_time_sink_x_3.enable_control_panel(False)
@@ -500,7 +499,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
             self.top_grid_layout.setColumnStretch(c, 1)
         self.qtgui_const_sink_x_0 = qtgui.const_sink_c(
             1024, #size
-            "", #name
+            "Constellation", #name
             1, #number of inputs
             None # parent
         )
@@ -508,7 +507,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.qtgui_const_sink_x_0.set_y_axis((-2), 2)
         self.qtgui_const_sink_x_0.set_x_axis((-2), 2)
         self.qtgui_const_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, "")
-        self.qtgui_const_sink_x_0.enable_autoscale(False)
+        self.qtgui_const_sink_x_0.enable_autoscale(True)
         self.qtgui_const_sink_x_0.enable_grid(False)
         self.qtgui_const_sink_x_0.enable_axis_labels(True)
 
@@ -547,7 +546,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.fft_filter_xxx_0_0_0 = filter.fft_filter_ccc(1, low_pass_filter_taps, 1)
         self.fft_filter_xxx_0_0_0.declare_sample_delay(0)
         self.epy_block_3 = epy_block_3.blk(reference_bits_path='tx_bits.bin', log_file='data/snr_log.txt')
-        self.epy_block_2 = epy_block_2.blk(reference_bits_path="tx_bits.bin", log_file_path="data/ber_log.csv")
+        self.epy_block_2 = epy_block_2.blk(reference_bits_path="data/tx_bits.bin", log_file_path="data/ber_log.csv")
         self.epy_block_0 = epy_block_0.blk(FileName="message.txt", Pkt_len=52)
         self.digital_symbol_sync_xx_0 = digital.symbol_sync_cc(
             digital.TED_MUELLER_AND_MULLER,
@@ -565,10 +564,10 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.digital_map_bb_0 = digital.map_bb([0,1])
         self.digital_fll_band_edge_cc_0 = digital.fll_band_edge_cc(sps, excess_bw, 44, phase_bw)
         self.digital_diff_decoder_bb_0 = digital.diff_decoder_bb(2, digital.DIFF_DIFFERENTIAL)
-        self.digital_crc32_bb_0_0 = digital.crc32_bb(True, "packet_len", True)
+        self.digital_crc32_bb_0_0 = digital.crc32_bb(True, "packet_len", False)
         self.digital_crc32_bb_0 = digital.crc32_bb(False, "packet_len", True)
         self.digital_costas_loop_cc_0 = digital.costas_loop_cc(phase_bw, 2, False)
-        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts("11100001010110101110100010010011",
+        self.digital_correlate_access_code_xx_ts_0 = digital.correlate_access_code_bb_ts(access_key,
           thresh, 'packet_len')
         self.digital_constellation_modulator_0 = digital.generic_mod(
             constellation=bpsk,
@@ -581,6 +580,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
             truncate=False)
         self.digital_constellation_decoder_cb_0 = digital.constellation_decoder_cb(bpsk)
         self.blocks_unpacked_to_packed_xx_0 = blocks.unpacked_to_packed_bb(8, gr.GR_MSB_FIRST)
+        self.blocks_unpack_k_bits_bb_0 = blocks.unpack_k_bits_bb(8)
         self.blocks_uchar_to_float_2 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_1 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0_0_0_0 = blocks.uchar_to_float()
@@ -588,8 +588,6 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.blocks_uchar_to_float_0_0 = blocks.uchar_to_float()
         self.blocks_uchar_to_float_0 = blocks.uchar_to_float()
         self.blocks_throttle2_1_2 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
-        self.blocks_throttle2_1_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
-        self.blocks_throttle2_1_0 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_1 = blocks.throttle( gr.sizeof_float*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_0_0 = blocks.throttle( gr.sizeof_gr_complex*1, usrp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * usrp_rate) if "auto" == "time" else int(0.1), 1) )
         self.blocks_throttle2_0 = blocks.throttle( gr.sizeof_gr_complex*1, samp_rate, True, 0 if "auto" == "auto" else max( int(float(0.1) * samp_rate) if "auto" == "time" else int(0.1), 1) )
@@ -613,7 +611,7 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.blocks_file_sink_1_0.set_unbuffered(False)
         self.blocks_file_sink_1 = blocks.file_sink(gr.sizeof_char*1, 'data/tx_data.bin', False)
         self.blocks_file_sink_1.set_unbuffered(False)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, './output.tmp', False)
+        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_char*1, 'data/output.tmp', False)
         self.blocks_file_sink_0.set_unbuffered(True)
         self.analog_agc_xx_0 = analog.agc_cc((1e-4), 1.0, 1.0, 2.0)
 
@@ -636,15 +634,14 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_throttle2_0, 0), (self.qtgui_freq_sink_x_0, 0))
         self.connect((self.blocks_throttle2_0_0, 0), (self.zeromq_pub_sink_0, 0))
         self.connect((self.blocks_throttle2_1, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.blocks_throttle2_1_0, 0), (self.qtgui_time_sink_x_0_2, 0))
-        self.connect((self.blocks_throttle2_1_1, 0), (self.qtgui_time_sink_x_0_0, 0))
         self.connect((self.blocks_throttle2_1_2, 0), (self.qtgui_time_sink_x_1, 0))
         self.connect((self.blocks_uchar_to_float_0, 0), (self.qtgui_time_sink_x_2, 0))
-        self.connect((self.blocks_uchar_to_float_0_0, 0), (self.blocks_throttle2_1_0, 0))
-        self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.blocks_throttle2_1_1, 0))
+        self.connect((self.blocks_uchar_to_float_0_0, 0), (self.qtgui_time_sink_x_0_2, 0))
+        self.connect((self.blocks_uchar_to_float_0_0_0, 0), (self.qtgui_time_sink_x_0_0, 0))
         self.connect((self.blocks_uchar_to_float_0_0_0_0, 0), (self.blocks_throttle2_1, 0))
         self.connect((self.blocks_uchar_to_float_1, 0), (self.qtgui_time_sink_x_3, 0))
         self.connect((self.blocks_uchar_to_float_2, 0), (self.qtgui_time_sink_x_4, 0))
+        self.connect((self.blocks_unpack_k_bits_bb_0, 0), (self.blocks_file_sink_3_0, 0))
         self.connect((self.blocks_unpacked_to_packed_xx_0, 0), (self.blocks_file_sink_2, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.digital_diff_decoder_bb_0, 0))
         self.connect((self.digital_constellation_decoder_cb_0, 0), (self.epy_block_3, 0))
@@ -655,8 +652,8 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
         self.connect((self.digital_correlate_access_code_xx_ts_0, 0), (self.epy_block_2, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.digital_constellation_decoder_cb_0, 0))
         self.connect((self.digital_costas_loop_cc_0, 0), (self.qtgui_const_sink_x_0, 0))
-        self.connect((self.digital_crc32_bb_0, 0), (self.blocks_file_sink_3_0, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.blocks_tagged_stream_mux_0, 1))
+        self.connect((self.digital_crc32_bb_0, 0), (self.blocks_unpack_k_bits_bb_0, 0))
         self.connect((self.digital_crc32_bb_0, 0), (self.digital_protocol_formatter_bb_0, 0))
         self.connect((self.digital_crc32_bb_0_0, 0), (self.blocks_file_sink_0, 0))
         self.connect((self.digital_diff_decoder_bb_0, 0), (self.digital_map_bb_0, 0))
@@ -712,12 +709,6 @@ class bpsk_mix(gr.top_block, Qt.QWidget):
     def set_access_key(self, access_key):
         self.access_key = access_key
         self.set_hdr_format(digital.header_format_default(self.access_key, 0))
-
-    def get_usrp_rate_0(self):
-        return self.usrp_rate_0
-
-    def set_usrp_rate_0(self, usrp_rate_0):
-        self.usrp_rate_0 = usrp_rate_0
 
     def get_usrp_rate(self):
         return self.usrp_rate
