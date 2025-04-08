@@ -213,7 +213,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [432, 172.0]
+    coordinate: [448, 208.0]
     rotation: 0
     state: true
 - name: blocks_uchar_to_float_0_0
@@ -425,7 +425,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [32, 292.0]
+    coordinate: [16, 268.0]
     rotation: 0
     state: enabled
 - name: qtgui_const_sink_x_0
@@ -455,9 +455,9 @@ blocks:
     color7: '"red"'
     color8: '"red"'
     color9: '"red"'
-    comment: 0,2,1,2
+    comment: ''
     grid: 'False'
-    gui_hint: 0,2,1,2
+    gui_hint: 0,1
     label1: ''
     label10: ''
     label2: ''
@@ -479,7 +479,7 @@ blocks:
     marker7: '0'
     marker8: '0'
     marker9: '0'
-    name: '""'
+    name: '"Rx Constellation"'
     nconnections: '1'
     size: '1024'
     style1: '0'
@@ -555,7 +555,7 @@ blocks:
     fftsize: '1024'
     freqhalf: 'True'
     grid: 'False'
-    gui_hint: 0,0,1,2
+    gui_hint: 0,0
     label: Relative Gain
     label1: ''
     label10: ''''''
@@ -570,7 +570,7 @@ blocks:
     legend: 'True'
     maxoutbuf: '0'
     minoutbuf: '0'
-    name: '""'
+    name: '"Rx Signal Spectrum"'
     nconnections: '1'
     norm_window: 'False'
     showports: 'False'
@@ -632,7 +632,7 @@ blocks:
     ctrlpanel: 'False'
     entags: 'True'
     grid: 'False'
-    gui_hint: 1,2,1,2
+    gui_hint: 1,1
     label1: ''
     label10: ''
     label2: ''
@@ -729,7 +729,7 @@ blocks:
     ctrlpanel: 'False'
     entags: 'True'
     grid: 'False'
-    gui_hint: 1,0,1,2
+    gui_hint: 1,0
     label1: ''
     label10: ''
     label2: ''
@@ -812,7 +812,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [240, 156.0]
+    coordinate: [248, 192.0]
     rotation: 0
     state: true
 - name: virtual_sink_0
